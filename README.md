@@ -3,6 +3,18 @@ Download specific MTG card image from [Scryfall](https://scryfall.com/)
 
 And convert it to a one-to-one size to meet the main image requirements of the damn Taobao.
 
+## requirements
+
+`python3 > 3.10.0`
+
+`python-requests`
+
+`python-BeautifulSoup`
+
+[imagemagick](https://imagemagick.org/script/download.php):If you are using Windows, you may need to modify the execution path of convert command.
+
+
+
 ## 中文
 
 从 [Scryfall](https://scryfall.com/) 下载万智牌卡图，并且将其转为 `1:1` 的比例, 以便适应上架淘宝的要求。
