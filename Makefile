@@ -1,10 +1,11 @@
-PYTHON = python3  # Adjust if you use a different interpreter
+PYTHON = python3
 
 run:
+	if [ ! -d imgs ] ; then mkdir imgs;fi
 	$(PYTHON) src/getMTGPic.py
 
 clean:
-	rm -f imgs/*.jpg  # Remove all downloaded JPEG images
+	rm -f imgs/*.jpg
 	rm -rf cardList
 
 rebuild: clean run
