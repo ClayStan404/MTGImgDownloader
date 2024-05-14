@@ -5,7 +5,7 @@ import os
 
 
 def download_image(url, filename):
-    filename='imgs/'+filename
+    filename = 'imgs/'+filename
     response = requests.get(url)
     if response.status_code == 200:
         with open(filename, 'wb') as f:
@@ -17,40 +17,47 @@ def download_image(url, filename):
         print('Download faild:', response.status_code)
 
 
-def get_image_url(cardSet, cardNo):
-    baseurl = 'https://scryfall.com/card'
-    #  url = baseurl+'/'+cardSet+'/'+cardNo+"/zhs"
-    url = baseurl+'/'+cardSet+'/'+cardNo
-
+def get_image_url(url, cardSet, cardNo):
     response = requests.get(url)
     soup = BeautifulSoup(response.content, 'html.parser')
-
-    cardName = soup.find_all('title')[0].text.split('·')[0]+cardSet+'_'+cardNo
-    fileName = cardName+'.jpg'
-    #  fileName = "default-"+cardSet+cardNo+'.jpg'
-    #  fileName = '_'.join(image_elements[0]['alt'].split('(')[0].split())+'.jpg'
+    cardName = soup.find_all('title')[0].text.split(
+        '·')[0].split('//')[0]+cardSet+'_'+cardNo
     image_elements = soup.find_all('img')
     image_url = image_elements[0]['src']
     if image_url.startswith('http'):
         fileName = '_'.join(
-            image_elements[0]['alt'].split('(')[0].split())+cardSet+'_'+cardNo+'.jpg'
-        fileName = fileName.replace('_//', '')
+            image_elements[0]['alt'].split('(')[0].split()).split('_//')[0]+'-'+cardSet+'-'+cardNo+'.jpg'
         download_image(image_url, fileName)
         print("download from scryfall: ", cardName)
     else:
         print('faild parse url from scryfall,try it again from mtgpics')
         image_url = 'https://www.mtgpics.com/pics/big/'+cardSet+'/'+cardNo+'.jpg'
+        fileName = cardSet+'_'+cardNo+'.jpg'
         download_image(image_url, fileName)
         print("download from mtgpics: ", cardName)
+    return cardName
 
 
 def main():
+    baseurl = 'https://scryfall.com/card'
     with open("MTGCardList", "r") as f:
         for line in f:
-            values = line.split()  # Split the line by whitespace
-            if len(values) == 2:  # Check if there are exactly two values
-                cardSet, cardNo = values  # Extract the key and value
-                get_image_url(cardSet, cardNo)
+            cardInfo = line.split()
+            if len(cardInfo) == 2:
+                cardSet, cardNo = cardInfo
+                try:
+                    url = baseurl+'/'+cardSet+'/'+cardNo+"/zhs"
+                    cardName = get_image_url(url, cardSet, cardNo)
+                except IndexError:
+                    url = baseurl+'/'+cardSet+'/'+cardNo
+                    cardName = get_image_url(url, cardSet, cardNo)
+                except Exception as e:
+                    raise e
+                shellCMD = 'echo "'+cardName+'" >> cardList'
+                os.system(shellCMD)
+            else:
+                print("illegal line: ", line)
+                continue
 
 
 if __name__ == '__main__':
