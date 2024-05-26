@@ -10,7 +10,7 @@ def download_image(url, filename):
     if response.status_code == 200:
         with open(filename, 'wb') as f:
             f.write(response.content)
-        cmdShell = '''convert "'''+filename + \
+        cmdShell = '''magick "'''+filename + \
             '''" -resize '745x745^' -gravity center -extent 1000x1000 "''' + filename+'''"'''
         os.system(cmdShell)
     else:
